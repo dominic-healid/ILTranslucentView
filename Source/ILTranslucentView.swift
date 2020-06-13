@@ -10,19 +10,18 @@
 
 import UIKit
 
-@IBDesignable
-open class ILTranslucentView: UIView {
+class ILTranslucentView: UIView {
 
-    fileprivate var _translucent = true
-    @IBInspectable open var translucent : Bool {
+    private var _translucent = true
+    var translucent : Bool {
         set {
             _translucent = newValue
             if self.toolbarBG == nil {
                 return
             }
-
+            
             self.toolbarBG!.isTranslucent = newValue
-
+            
             if newValue {
                 self.toolbarBG!.isHidden = false
                 self.toolbarBG!.barTintColor = self.ilColorBG
@@ -36,9 +35,9 @@ open class ILTranslucentView: UIView {
             return _translucent
         }
     }
-
-    fileprivate var _translucentAlpha : CGFloat = 1.0
-    @IBInspectable open var translucentAlpha : CGFloat {
+    
+    private var _translucentAlpha : CGFloat = 1.0
+    public var translucentAlpha : CGFloat {
         set {
             if newValue > 1 {
                 _translucentAlpha = 1
@@ -47,7 +46,7 @@ open class ILTranslucentView: UIView {
             } else {
                 _translucentAlpha = newValue
             }
-
+            
             if self.toolbarBG != nil {
                 self.toolbarBG!.alpha = _translucentAlpha
             }
@@ -56,8 +55,8 @@ open class ILTranslucentView: UIView {
             return _translucentAlpha
         }
     }
-
-    @IBInspectable open var translucentStyle : UIBarStyle {
+    
+    var translucentStyle : UIBarStyle {
         set {
             if self.toolbarBG != nil {
                 self.toolbarBG!.barStyle = newValue
@@ -71,12 +70,12 @@ open class ILTranslucentView: UIView {
             }
         }
     }
-
-    fileprivate var _translucentTintColor = UIColor.clear
-    @IBInspectable open var translucentTintColor : UIColor {
+    
+    private var _translucentTintColor = UIColor.clear
+    var translucentTintColor : UIColor {
         set {
             _translucentTintColor = newValue
-            if (self.isItClearColor(newValue)) {
+            if (self.isItClearColor(color: newValue)) {
                 self.toolbarBG!.barTintColor = self.ilDefaultColorBG
             } else {
                 self.toolbarBG!.barTintColor = self.translucentTintColor
@@ -86,70 +85,70 @@ open class ILTranslucentView: UIView {
             return _translucentTintColor
         }
     }
-
-    fileprivate var ilColorBG : UIColor?
-    fileprivate var ilDefaultColorBG : UIColor?
-
-    fileprivate var toolbarBG : UIToolbar?
-    fileprivate var nonExistentSubview : UIView?
-    fileprivate var toolbarContainerClipView : UIView?
-    fileprivate var overlayBackgroundView : UIView?
-    fileprivate var initComplete = false
-
+    
+    private var ilColorBG : UIColor?
+    private var ilDefaultColorBG : UIColor?
+    
+    private var toolbarBG : UIToolbar?
+    private var nonExistentSubview : UIView?
+    private var toolbarContainerClipView : UIView?
+    private var overlayBackgroundView : UIView?
+    private var initComplete = false
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.createUI()
     }
-
-    required public init?(coder aDecoder: NSCoder) {
+    
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         self.createUI()
     }
 }
 
 extension ILTranslucentView {
-    fileprivate func createUI() {
+    private func createUI() {
         self.ilColorBG = self.backgroundColor
-
+        
         self.translucent = true
         self.translucentAlpha = 1
 
         let _nonExistentSubview = UIView(frame: self.bounds)
         _nonExistentSubview.backgroundColor = UIColor.clear
         _nonExistentSubview.clipsToBounds = true
-        _nonExistentSubview.autoresizingMask = [UIViewAutoresizing.flexibleBottomMargin, UIViewAutoresizing.flexibleLeftMargin, UIViewAutoresizing.flexibleRightMargin, UIViewAutoresizing.flexibleTopMargin]
+        _nonExistentSubview.autoresizingMask = [.flexibleBottomMargin,.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin]
         self.nonExistentSubview = _nonExistentSubview
         self.insertSubview(self.nonExistentSubview!, at: 0)
 
         let _toolbarContainerClipView = UIView(frame: self.bounds)
         _toolbarContainerClipView.backgroundColor = UIColor.clear
         _toolbarContainerClipView.clipsToBounds = true
-        _toolbarContainerClipView.autoresizingMask = [UIViewAutoresizing.flexibleBottomMargin, UIViewAutoresizing.flexibleLeftMargin, UIViewAutoresizing.flexibleRightMargin, UIViewAutoresizing.flexibleTopMargin]
+        _toolbarContainerClipView.autoresizingMask = [.flexibleBottomMargin,.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin]
         self.toolbarContainerClipView = _toolbarContainerClipView
         self.nonExistentSubview!.addSubview(self.toolbarContainerClipView!)
 
         var rect = self.bounds
         rect.origin.y -= 1
         rect.size.height += 1
-
+        
         let _toolbarBG = UIToolbar(frame: rect)
-        _toolbarBG.autoresizingMask = [UIViewAutoresizing.flexibleWidth, UIViewAutoresizing.flexibleHeight]
+        _toolbarBG.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.toolbarBG = _toolbarBG
-
+        
         self.toolbarContainerClipView!.addSubview(self.toolbarBG!)
         self.ilDefaultColorBG = self.toolbarBG!.barTintColor
-
-        let _overlayBackgroundView = UIView(frame: self.bounds)
+        
+        var _overlayBackgroundView = UIView(frame: self.bounds)
         _overlayBackgroundView.backgroundColor = self.backgroundColor
-        _overlayBackgroundView.autoresizingMask = [UIViewAutoresizing.flexibleWidth, UIViewAutoresizing.flexibleHeight]
+        _overlayBackgroundView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.overlayBackgroundView = _overlayBackgroundView
         self.toolbarContainerClipView!.addSubview(self.overlayBackgroundView!)
-
+        
         self.backgroundColor = UIColor.clear
         self.initComplete = true
     }
-
-    fileprivate func isItClearColor(_ color: UIColor) -> Bool {
+    
+    private func isItClearColor(color: UIColor) -> Bool {
         var red : CGFloat = 0.0
         var green : CGFloat = 0.0
         var blue : CGFloat = 0.0
@@ -157,29 +156,29 @@ extension ILTranslucentView {
         color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
         return red == 0.0 && green == 0.0 && blue == 0.0 && alpha == 0.0
     }
-
-    @objc open override var frame : CGRect {
+    
+    @objc override var frame : CGRect {
         set {
             if self.toolbarContainerClipView == nil {
                 super.frame = newValue
                 return
             }
-
+            
             var rect = newValue
             rect.origin = CGPoint.zero
-
+            
             let width = self.toolbarContainerClipView!.frame.width
             if width > rect.width {
                 rect.size.width = width
             }
-
+            
             let height = self.toolbarContainerClipView!.frame.height
             if height > rect.height {
                 rect.size.height = height
             }
-
+            
             self.toolbarContainerClipView!.frame = rect
-
+            
             super.frame = newValue
             self.nonExistentSubview!.frame = self.bounds
         }
@@ -187,22 +186,22 @@ extension ILTranslucentView {
             return super.frame
         }
     }
-
-    @objc override open var bounds : CGRect {
+    
+    @objc override var bounds : CGRect {
         set {
             var rect = newValue
             rect.origin = CGPoint.zero
-
+            
             let width = self.toolbarContainerClipView!.bounds.width
             if width > rect.width {
                 rect.size.width = width
             }
-
+            
             let height = self.toolbarContainerClipView!.bounds.height
             if height > rect.height {
                 rect.size.height = height
             }
-
+            
             self.toolbarContainerClipView!.bounds = rect
             super.bounds = newValue
             self.nonExistentSubview!.frame = self.bounds
@@ -211,8 +210,8 @@ extension ILTranslucentView {
             return super.bounds
         }
     }
-
-    @objc override open var backgroundColor : UIColor! {
+    
+    @objc override var backgroundColor : UIColor! {
         set {
             if self.initComplete {
                 self.ilColorBG = newValue
@@ -228,11 +227,11 @@ extension ILTranslucentView {
             return super.backgroundColor
         }
     }
-
-    @objc override open var subviews : [UIView] {
+    
+    @objc override var subviews: [UIView] {
         if self.initComplete {
-            var array = super.subviews as [UIView]
-
+            var array = super.subviews as Array<UIView>
+            
             var index = 0
             for view in array {
                 if view == self.nonExistentSubview {
@@ -240,34 +239,35 @@ extension ILTranslucentView {
                 }
                 index += 1
             }
-
+            
             if index < array.count {
                 array.remove(at: index)
             }
-
+            
             return array
         } else {
             return super.subviews
         }
     }
-
-    override open func sendSubview(toBack view: UIView)  {
+    
+    
+    override func sendSubviewToBack(_ view: UIView)  {
         if self.initComplete {
             self.insertSubview(view, aboveSubview: self.toolbarContainerClipView!)
         } else {
-            super.sendSubview(toBack: view)
+            super.sendSubviewToBack(view)
         }
     }
-
-    override open func insertSubview(_ view: UIView, at index: Int) {
+    
+    override func insertSubview(_ view: UIView, at index: Int) {
         if self.initComplete {
             super.insertSubview(view, at: index + 1)
         } else {
             super.insertSubview(view, at: index)
         }
     }
-
-    override open func exchangeSubview(at index1: Int, withSubviewAt index2: Int)  {
+    
+    override func exchangeSubview(at index1: Int, withSubviewAt index2: Int)  {
         if self.initComplete {
             super.exchangeSubview(at: (index1 + 1), withSubviewAt: (index2 + 1))
         } else {
